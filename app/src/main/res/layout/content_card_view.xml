@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    card_view:cardBackgroundColor="#80bebebe"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_height="80dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_weight="0.20"
+            android:src="@mipmap/ic_logo"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/txtPuntos"
+            android:layout_width="0dp"
+            android:gravity="center|left"
+            android:paddingLeft="20dp"
+            android:textSize="24dp"
+            android:textColor="@color/primary_text"
+            android:layout_weight="0.80"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
