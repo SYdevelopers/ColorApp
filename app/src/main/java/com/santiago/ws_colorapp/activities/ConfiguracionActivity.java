@@ -20,7 +20,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private TextInputEditText tiempoTotal,intentos,tiempoPalabra;
     private Button btnJugar;
-    private LinearLayout layoutTiempo,layoutInteno;
+    private LinearLayout layoutTiempo,layoutInteno,lineargeneral;
     private RadioButton radioTiempo,radioIntentos;
 
     public final static int JUEGOINTENTOS=0;
@@ -52,6 +52,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
         radioTiempo=findViewById(R.id.radioTiempo);
         tiempoPalabra=findViewById(R.id.txtTiempoPalabraConfig);
         btnJugar=findViewById(R.id.btnJugarConfig);
+        lineargeneral = findViewById(R.id.linearGeneral);
     }
 
 
@@ -86,8 +87,10 @@ public class ConfiguracionActivity extends AppCompatActivity {
     public void validarRadios(View view) {
         switch (view.getId()){
             case R.id.radioIntentos:
+                lineargeneral.setVisibility(View.VISIBLE);
                 layoutInteno.setVisibility(View.VISIBLE);
                 layoutTiempo.setVisibility(View.INVISIBLE);
+                layoutTiempo.setVisibility(View.GONE);
                 String intentos=preferences.getString("intentos",null);
                 String tiempoP=preferences.getString("tiempoP",null);
                 if (tiempoP!=null && intentos!=null){
@@ -96,8 +99,10 @@ public class ConfiguracionActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.radioTiempo:
+                lineargeneral.setVisibility(View.VISIBLE);
                 layoutTiempo.setVisibility(View.VISIBLE);
                 layoutInteno.setVisibility(View.INVISIBLE);
+                layoutInteno.setVisibility(View.GONE);
                 String tiempoT=preferences.getString("tiempoT",null);
                 tiempoP = preferences.getString("tiempoP", null);
                 if (null!=tiempoP && null!=tiempoT){
