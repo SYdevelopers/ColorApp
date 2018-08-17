@@ -12,13 +12,15 @@
         <activity
             android:name=".activities.SplashActivity"
             android:theme="@style/noActionBar">
+
+        </activity>
+        <activity android:name=".activities.InicioActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.InicioActivity" />
         <activity
             android:name=".activities.JuegoActivity"
             android:theme="@style/noActionBar" />
