@@ -574,7 +574,6 @@ public class JuegoConfigActivity extends AppCompatActivity {
         fab3.setEnabled(true);
         fab4.setEnabled(true);
     }
-
     public void verificarRespuestaConfig(View view) {
         seleccion=true;
         desabilitarBotones();

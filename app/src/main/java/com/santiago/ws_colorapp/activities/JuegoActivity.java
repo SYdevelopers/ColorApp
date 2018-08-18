@@ -23,16 +23,16 @@ import java.util.Random;
 
 public class JuegoActivity extends AppCompatActivity {
     Button pause;
-    TextView tiempo,movimientos,reaccion,palabra,correctas1, incorrectas1;
+    TextView tiempo,movimientos,reaccion,palabra;
     FloatingActionButton fab1,fab2,fab3,fab4;
-    long tiempoTotal=30000,tiempoPalabra=3000;
+    long tiempoTotal=30000,tiempoPalabra=3000,tiempo_restante;
     int mil=1000,incorrectas=0,correctas=0,totalPalabaras=0,posicionPalabra;
     String colores[]={"AMARILLO","ROJO","AZUL","VERDE"};
     Random random= new Random();
     boolean seleccion=false;
-    float porReaccion, reacc;
+    float porReaccion;
     boolean estado=true;
-    int movi, correc, incorec;
+    int count=0;
     private CountDownTimer contador;
 
     @Override
@@ -40,6 +40,7 @@ public class JuegoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_juego);
         inicializar();
+        play();
         reaccion.setText("0%");
 
     }
@@ -47,8 +48,6 @@ public class JuegoActivity extends AppCompatActivity {
     private void cambiarPalabra() {
         habilitarBotones();
         totalPalabaras++;
-        correctas1.setText(correctas+"");
-        incorrectas1.setText(incorrectas+"");
         movimientos.setText(totalPalabaras+"");
         posicionPalabra=random.nextInt(4);
         palabra.setText(colores[posicionPalabra]);
@@ -257,17 +256,22 @@ public class JuegoActivity extends AppCompatActivity {
                     finish();
                     cancel();
                 }else if (incorrectas==3) {
+                    tiempo_restante=l/1000;
                     totalPalabaras = correctas + incorrectas;
                     onFinish();
                     cancel();
+
+                }
+                if (count ==4){
+                    pause.setBackgroundResource(R.drawable.play_desactivado);
+                    pause.setEnabled(false);
                 }
 
             }
 
             @Override
             public void onFinish() {
-                estado=false;
-                pause.setBackgroundResource(R.drawable.play);
+
                 tiempo.setText("0''");
                 DatosBD bd=new DatosBD(JuegoActivity.this);
                 Juego juego= new Juego();
@@ -283,7 +287,8 @@ public class JuegoActivity extends AppCompatActivity {
                 builder.setMessage("Total de palabras: "+ totalPalabaras+"\n"+
                         "Correctas: "+correctas+"\n"+
                         "Incorrectas: "+incorrectas+"\n"+
-                        "Reaccion: "+reaccion.getText().toString());
+                        "Reaccion: "+reaccion.getText().toString()+"\n"+
+                        "Tiempo restante: "+tiempo_restante+"''");
                 builder.setPositiveButton("Compartir", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -292,9 +297,11 @@ public class JuegoActivity extends AppCompatActivity {
                                 "Total de palabras: "+ totalPalabaras+"\n"+
                                 "Correctas: "+correctas+"\n"+
                                 "Incorrectas: "+incorrectas+"\n"+
-                                "Reaccion: "+reaccion.getText().toString());
+                                "Reaccion: "+reaccion.getText().toString()+"\n"+
+                                "Tiempo restante: "+tiempo_restante+"''");
                         intent.setType("text/plain");
                         startActivity(intent);
+                        onBackPressed();
                     }
                 });
                 builder.setNegativeButton("Terminar", new DialogInterface.OnClickListener() {
@@ -354,23 +361,17 @@ public class JuegoActivity extends AppCompatActivity {
         finish();
     }
 
+    //inicializamos los elemntos graficos con lo cuales trabajaremos
     private void inicializar() {
         tiempo=findViewById(R.id.txtTiempo);
         movimientos=findViewById(R.id.txtmovimientos);
         reaccion=findViewById(R.id.txtReaccion);
         palabra=findViewById(R.id.txtPalabra);
-        correctas1=findViewById(R.id.textView_correctas);
-        incorrectas1=findViewById(R.id.textView_incorrectas);
-
-
-
         fab1=findViewById(R.id.fab1);
         fab2=findViewById(R.id.fab2);
         fab3=findViewById(R.id.fab3);
         fab4=findViewById(R.id.fab4);
-
         pause = findViewById(R.id.button_pausar);
-
     }
 
     private void desabilitarBotones(){
@@ -388,11 +389,8 @@ public class JuegoActivity extends AppCompatActivity {
     }
 
     public void pausarJuego(View view) {
+        count++;
         if (estado){
-
-            cambiarColorPalabra();
-            cambiarColorBoton();
-            cambiarPalabra();
             play();
         }else {
             pausar();
@@ -403,6 +401,9 @@ public class JuegoActivity extends AppCompatActivity {
 
     private void play() {
         iniciarJuego();
+        cambiarColorPalabra();
+        cambiarColorBoton();
+        cambiarPalabra();
         estado=false;
         pause.setBackgroundResource(R.drawable.pause);
 
