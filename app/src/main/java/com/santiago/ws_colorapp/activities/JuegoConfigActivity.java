@@ -10,11 +10,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.santiago.ws_colorapp.R;
 import com.santiago.ws_colorapp.datos.Utils;
 
+import java.util.Locale;
 import java.util.Random;
 
 public class JuegoConfigActivity extends AppCompatActivity {
@@ -28,7 +30,10 @@ public class JuegoConfigActivity extends AppCompatActivity {
     private float porReaccion;
     String colores[]={"AMARILLO","AZUL","VERDE","ROJO"};
     int bColor1=0,bColor2=0,bColor3=0,bColor4=0;
-    int color=0;
+    int color=0, count=0;
+    boolean estado=true;
+    Button pause, pauseIntentos;
+    private CountDownTimer contador, contador_intentos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +51,16 @@ public class JuegoConfigActivity extends AppCompatActivity {
                 case ConfiguracionActivity.JUEGOINTENTOS:
                     tiempo.setVisibility(View.GONE);
                     tiempoView.setVisibility(View.GONE);
-                    intentosC= Integer.parseInt(bundle.getString("intentos"));
+                    intentosC= Integer.parseInt(bundle.getString("intentos"))+1;
                     tiempoPalabra= Long.parseLong(bundle.getString("tiempoP"))*1000;
-                    iniciarJuegoIntentos();
+                    playCIntentos();
                     break;
                 case ConfiguracionActivity.JUEGOTIEMPO:
                     intentos.setVisibility(View.GONE);
                     intentosView.setVisibility(View.GONE);
                     tiempoTotal= Long.parseLong(bundle.getString("tiempoT"))*1000;
                     tiempoPalabra= Long.parseLong(bundle.getString("tiempoP"))*1000;
-                    iniciarJuego();
+                    playC();
                     break;
             }
         }
@@ -63,20 +68,26 @@ public class JuegoConfigActivity extends AppCompatActivity {
 
 
     private void iniciarJuego() {
-        cambiarColorPalabra();
-        cambiarColorBotones();
-        cambiarPalabra();
-        new CountDownTimer(tiempoTotal,mil) {
+        pauseIntentos.setVisibility(View.GONE);
+        pause.setVisibility(View.VISIBLE);
+        contador =new CountDownTimer(tiempoTotal,mil) {
             @Override
             public void onTick(long l) {
                 int time= (int) (l/mil);
+                tiempoTotal=l;
+                actualizarTextoTiempo();
                 tiempo.setText(time+"''");
                 if((JuegoConfigActivity.this.isFinishing())){
                     finish();
                     cancel();
                 }else if (incorrectas==3 ){
+                    totalPalabras    = correctas + incorrectas;
                     onFinish();
                     cancel();
+                }
+                if (count ==4){
+                    pause.setBackgroundResource(R.drawable.play_desactivado);
+                    pause.setEnabled(false);
                 }
             }
 
@@ -95,7 +106,6 @@ public class JuegoConfigActivity extends AppCompatActivity {
     private void cambiarPalabra() {
         habilitarBotones();
         totalPalabras++;
-        intentosC--;
         movimientos.setText(totalPalabras+"");
         intentos.setText(intentosC+"");
         posicionPalabra=random.nextInt(4);
@@ -311,19 +321,61 @@ public class JuegoConfigActivity extends AppCompatActivity {
 
     }
 
+    public void pausarJuegoC(View view) {
+        count++;
+        if (estado){
+            playC();
+        }else {
+            pausarC();
+            palabra.setEnabled(false);
+            desabilitarBotones();
+        }
+    }
+    private void playC() {
+        iniciarJuego();
+        cambiarColorPalabra();
+        cambiarColorBotones();
+        cambiarPalabra();
+        estado=false;
+        pause.setBackgroundResource(R.drawable.pause);
 
-    private void iniciarJuegoIntentos()         {
-        if (incorrectas==3 || intentosC==0){
-            intentos.setText("0");
+    }
+    private void pausarC() {
+        totalPalabras--;
+        tiempo.setText("0''");
+        contador.cancel();
+        estado=true;
+        pause.setBackgroundResource(R.drawable.play);
+    }
+    private void actualizarTextoTiempo() {
+        int t= (int) (tiempoTotal/mil);
+        String tt= String.format( Locale.getDefault(),"%02d", t);
+        tiempo.setText(tt);
+
+    }
+
+
+
+    private void iniciarJuegoIntentos() {
+        pause.setVisibility(View.GONE);
+        pauseIntentos.setVisibility(View.VISIBLE);
+
+        if (incorrectas==3 ){
+            tiempoPalabra=0;
             final String message="Correctas:"+correctas+"\n"+
                     "Incorrectas: "+ incorrectas+"\n"+
                     "Reccion:"+ reaccion.getText().toString();
             Utils.alertDialog(JuegoConfigActivity.this,message);
-        }else {
-            cambiarColorPalabraIntentos();
-            cambiarColorBotonesIntentos();
-            cambiarPalabraIntentos();
         }
+
+        if (count == 4){
+            pauseIntentos.setBackgroundResource(R.drawable.play_desactivado);
+            pauseIntentos.setEnabled(false);
+        }
+        cambiarColorPalabraIntentos();
+        cambiarColorBotonesIntentos();
+        cambiarPalabraIntentos();
+
 
     }
     private void cambiarPalabraIntentos() {
@@ -335,29 +387,31 @@ public class JuegoConfigActivity extends AppCompatActivity {
         posicionPalabra=random.nextInt(4);
         palabra.setText(colores[posicionPalabra]);
 
-        new CountDownTimer(tiempoPalabra, mil) {
+        contador_intentos = new CountDownTimer(tiempoPalabra, mil) {
             @Override
             public void onTick(long l) {
+                if (intentosC==0){
+                    tiempoPalabra=0;
+                    final String message="Correctas:"+correctas+"\n"+
+                            "Incorrectas: "+ incorrectas+"\n"+
+                            "Reccion:"+ reaccion.getText().toString();
+                    Utils.alertDialog(JuegoConfigActivity.this,message);
+                }
 
             }
 
             @Override
             public void onFinish() {
-                if (!tiempo.getText().toString().equalsIgnoreCase("0''")){
+                if (!intentos.getText().toString().equalsIgnoreCase("0")){
                     if (seleccion==false){
                         porReaccion=((float) correctas/(float)totalPalabras)*100;
                         reaccion.setText((int) porReaccion+"%");
                         incorrectas++;
                     }
                     iniciarJuegoIntentos();
-//                    cambiarColorPalabraIntentos();
-//                    cambiarPalabraIntentos();
-//                    cambiarColorBotonesIntentos();
                 }
-
             }
         }.start();
-
     }
     private void cambiarColorBotonesIntentos() {
         seleccion=false;
@@ -530,22 +584,32 @@ public class JuegoConfigActivity extends AppCompatActivity {
             case 3:palabra.setTextColor(Color.parseColor("#c71f1e"));
                 break;
         }
-        new CountDownTimer(tiempoPalabra, mil) {
-            @Override
-            public void onTick(long l) {
+    }
 
-            }
-
-            @Override
-            public void onFinish() {
-                if (!tiempo.getText().toString().equalsIgnoreCase("0''")){
-                    cambiarColorPalabraIntentos();
-                }
-
-            }
-        }.start();
+    public void pausarJuegoCIntentos(View view) {
+        count++;
+        if (estado){
+            playCIntentos();
+        }else {
+            pausarCIntentos();
+        }
+    }
+    private void playCIntentos() {
+        iniciarJuegoIntentos();
+        estado=false;
+        pauseIntentos.setBackgroundResource(R.drawable.pause);
 
     }
+    private void pausarCIntentos() {
+        palabra.setEnabled(false);
+        desabilitarBotones();
+        totalPalabras--;
+        intentosC++;
+        contador_intentos.cancel();
+        estado=true;
+        pauseIntentos.setBackgroundResource(R.drawable.play);
+    }
+
 
 
     private void incializar() {
@@ -561,6 +625,8 @@ public class JuegoConfigActivity extends AppCompatActivity {
         fab2=findViewById(R.id.fab2Config);
         fab3=findViewById(R.id.fab3Config);
         fab4=findViewById(R.id.fab4Config);
+        pause= findViewById(R.id.button_pausarC);
+        pauseIntentos= findViewById(R.id.button_pausarCIntentos);
     }
     private void desabilitarBotones() {
         fab1.setEnabled(false);

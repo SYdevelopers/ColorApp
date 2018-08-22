@@ -45,6 +45,81 @@ public class JuegoActivity extends AppCompatActivity {
 
     }
 
+
+    private void iniciarJuego() {
+        contador = new CountDownTimer(tiempoTotal,mil) {
+            @Override
+            public void onTick(long l) {
+                int time= (int) (l/mil);
+                tiempoTotal=l;
+                actualizarTextoTiempo();
+                tiempo.setText(time +"''");
+                if ((JuegoActivity.this.isFinishing())){
+                    finish();
+                    cancel();
+                }else if (incorrectas==3) {
+                    tiempo_restante=l/1000;
+                    totalPalabaras = correctas + incorrectas;
+                    onFinish();
+                    cancel();
+
+                }
+                if (count ==4){
+                    pause.setBackgroundResource(R.drawable.play_desactivado);
+                    pause.setEnabled(false);
+                }
+
+            }
+
+            @Override
+            public void onFinish() {
+
+                tiempo.setText("0''");
+                DatosBD bd=new DatosBD(JuegoActivity.this);
+                Juego juego= new Juego();
+                juego.setReaccion(porReaccion);
+                if (bd.guardarPuntaje(juego)){
+                    Toast.makeText(JuegoActivity.this, "guardo", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(JuegoActivity.this, "no guardo", Toast.LENGTH_SHORT).show();
+                }
+
+                AlertDialog.Builder builder= new AlertDialog.Builder(JuegoActivity.this);
+                builder.setTitle("Resultados");
+                builder.setMessage("Total de palabras: "+ totalPalabaras+"\n"+
+                        "Correctas: "+correctas+"\n"+
+                        "Incorrectas: "+incorrectas+"\n"+
+                        "Reaccion: "+reaccion.getText().toString()+"\n"+
+                        "Tiempo restante: "+tiempo_restante+"''");
+                builder.setPositiveButton("Compartir", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent=new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_TEXT,"RESULTADOS: \n"+
+                                "Total de palabras: "+ totalPalabaras+"\n"+
+                                "Correctas: "+correctas+"\n"+
+                                "Incorrectas: "+incorrectas+"\n"+
+                                "Reaccion: "+reaccion.getText().toString()+"\n"+
+                                "Tiempo restante: "+tiempo_restante+"''");
+                        intent.setType("text/plain");
+                        startActivity(intent);
+                        onBackPressed();
+                    }
+                });
+                builder.setNegativeButton("Terminar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                        finish();
+                    }
+                }).setCancelable(false);
+                AlertDialog dialog=builder.create();
+                dialog.show();
+
+            }
+        }.start();
+
+    }
     private void cambiarPalabra() {
         habilitarBotones();
         totalPalabaras++;
@@ -75,7 +150,6 @@ public class JuegoActivity extends AppCompatActivity {
         }.start();
 
     }
-
     int bColor1=0,bColor2=0,bColor3=0,bColor4=0;
     private void cambiarColorBoton() {
         seleccion=false;
@@ -213,7 +287,6 @@ public class JuegoActivity extends AppCompatActivity {
             }
         }
     }
-
     int color=0;
     private void cambiarColorPalabra() {
         color=random.nextInt(4);
@@ -244,87 +317,43 @@ public class JuegoActivity extends AppCompatActivity {
 
     }
 
-    private void iniciarJuego() {
-        contador = new CountDownTimer(tiempoTotal,mil) {
-            @Override
-            public void onTick(long l) {
-                int time= (int) (l/mil);
-                tiempoTotal=l;
-                actualizarTextoTiempo();
-                tiempo.setText(time +"''");
-                if ((JuegoActivity.this.isFinishing())){
-                    finish();
-                    cancel();
-                }else if (incorrectas==3) {
-                    tiempo_restante=l/1000;
-                    totalPalabaras = correctas + incorrectas;
-                    onFinish();
-                    cancel();
 
-                }
-                if (count ==4){
-                    pause.setBackgroundResource(R.drawable.play_desactivado);
-                    pause.setEnabled(false);
-                }
 
-            }
 
-            @Override
-            public void onFinish() {
-
-                tiempo.setText("0''");
-                DatosBD bd=new DatosBD(JuegoActivity.this);
-                Juego juego= new Juego();
-                juego.setReaccion(porReaccion);
-                if (bd.guardarPuntaje(juego)){
-                    Toast.makeText(JuegoActivity.this, "guardo", Toast.LENGTH_SHORT).show();
-                }else{
-                    Toast.makeText(JuegoActivity.this, "no guardo", Toast.LENGTH_SHORT).show();
-                }
-
-                AlertDialog.Builder builder= new AlertDialog.Builder(JuegoActivity.this);
-                builder.setTitle("Resultados");
-                builder.setMessage("Total de palabras: "+ totalPalabaras+"\n"+
-                        "Correctas: "+correctas+"\n"+
-                        "Incorrectas: "+incorrectas+"\n"+
-                        "Reaccion: "+reaccion.getText().toString()+"\n"+
-                        "Tiempo restante: "+tiempo_restante+"''");
-                builder.setPositiveButton("Compartir", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent=new Intent(Intent.ACTION_SEND);
-                        intent.putExtra(Intent.EXTRA_TEXT,"RESULTADOS: \n"+
-                                "Total de palabras: "+ totalPalabaras+"\n"+
-                                "Correctas: "+correctas+"\n"+
-                                "Incorrectas: "+incorrectas+"\n"+
-                                "Reaccion: "+reaccion.getText().toString()+"\n"+
-                                "Tiempo restante: "+tiempo_restante+"''");
-                        intent.setType("text/plain");
-                        startActivity(intent);
-                        onBackPressed();
-                    }
-                });
-                builder.setNegativeButton("Terminar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        finish();
-                    }
-                }).setCancelable(false);
-                AlertDialog dialog=builder.create();
-                dialog.show();
-
-            }
-        }.start();
+    public void pausarJuego(View view) {
+        count++;
+        if (estado){
+            play();
+        }else {
+            pausar();
+            palabra.setEnabled(false);
+            desabilitarBotones();
+        }
+    }
+    private void play() {
+        iniciarJuego();
+        cambiarColorPalabra();
+        cambiarColorBoton();
+        cambiarPalabra();
+        estado=false;
+        pause.setBackgroundResource(R.drawable.pause);
 
     }
-
+    private void pausar() {
+        totalPalabaras--;
+        tiempo.setText("0''");
+        contador.cancel();
+        estado=true;
+        pause.setBackgroundResource(R.drawable.play);
+    }
     private void actualizarTextoTiempo() {
         int t= (int) (tiempoTotal/mil);
         String tt= String.format( Locale.getDefault(),"%02d", t);
         tiempo.setText(tt);
 
     }
+
+
 
     public void verificarRespuesta(View view) {
         seleccion=true;
@@ -354,14 +383,11 @@ public class JuegoActivity extends AppCompatActivity {
         reaccion.setText((int) porReaccion+"%");
         incorrectas=totalPalabaras-correctas;
     }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         finish();
     }
-
-    //inicializamos los elemntos graficos con lo cuales trabajaremos
     private void inicializar() {
         tiempo=findViewById(R.id.txtTiempo);
         movimientos=findViewById(R.id.txtmovimientos);
@@ -373,47 +399,16 @@ public class JuegoActivity extends AppCompatActivity {
         fab4=findViewById(R.id.fab4);
         pause = findViewById(R.id.button_pausar);
     }
-
     private void desabilitarBotones(){
         fab1.setEnabled(false);
         fab2.setEnabled(false);
         fab3.setEnabled(false);
         fab4.setEnabled(false);
     }
-
     private void habilitarBotones(){
         fab1.setEnabled(true);
         fab2.setEnabled(true);
         fab3.setEnabled(true);
         fab4.setEnabled(true);
-    }
-
-    public void pausarJuego(View view) {
-        count++;
-        if (estado){
-            play();
-        }else {
-            pausar();
-            palabra.setEnabled(false);
-            desabilitarBotones();
-        }
-    }
-
-    private void play() {
-        iniciarJuego();
-        cambiarColorPalabra();
-        cambiarColorBoton();
-        cambiarPalabra();
-        estado=false;
-        pause.setBackgroundResource(R.drawable.pause);
-
-    }
-
-    private void pausar() {
-        totalPalabaras--;
-        tiempo.setText("0''");
-        contador.cancel();
-        estado=true;
-        pause.setBackgroundResource(R.drawable.play);
     }
 }
