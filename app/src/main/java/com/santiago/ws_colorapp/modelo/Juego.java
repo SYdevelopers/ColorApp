@@ -14,15 +14,6 @@ public class Juego {
     public Juego() {
     }
 
-    public Juego(int totalPalabras, int correctas, int incorrectas, float reaccion, int tiempoPalabra, int tiempoTotal, int intentos) {
-        this.totalPalabras = totalPalabras;
-        this.correctas = correctas;
-        this.incorrectas = incorrectas;
-        this.reaccion = reaccion;
-        this.tiempoPalabra = tiempoPalabra;
-        this.tiempoTotal = tiempoTotal;
-        this.intentos = intentos;
-    }
 
     public int getTotalPalabras() {
         return totalPalabras;
