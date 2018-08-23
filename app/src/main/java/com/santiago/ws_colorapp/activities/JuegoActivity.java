@@ -2,6 +2,7 @@ package com.santiago.ws_colorapp.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.CountDownTimer;
@@ -39,6 +40,8 @@ public class JuegoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_juego);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         inicializar();
         play();
         reaccion.setText("0%");

@@ -2,6 +2,7 @@ package com.santiago.ws_colorapp.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
 
     private SharedPreferences preferences;
     private TextInputEditText tiempoTotal,intentos,tiempoPalabra;
+    private int tiempot=30, intentost=10,tiempopalabrat=3;
     private Button btnJugar;
     private LinearLayout layoutTiempo,layoutInteno,lineargeneral;
     private RadioButton radioTiempo,radioIntentos;
@@ -30,6 +32,8 @@ public class ConfiguracionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuracion);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 
         preferences=getSharedPreferences("Values",MODE_PRIVATE);
         inicializar();
@@ -53,6 +57,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
         tiempoPalabra=findViewById(R.id.txtTiempoPalabraConfig);
         btnJugar=findViewById(R.id.btnJugarConfig);
         lineargeneral = findViewById(R.id.linearGeneral);
+
     }
 
 
@@ -96,6 +101,9 @@ public class ConfiguracionActivity extends AppCompatActivity {
                 if (tiempoP!=null && intentos!=null){
                     this.intentos.setText(intentos);
                     tiempoPalabra.setText(tiempoP);
+                }else {
+                    tiempoPalabra.setText(tiempopalabrat+"");
+                    this.intentos.setText(intentost+"");
                 }
                 break;
             case R.id.radioTiempo:
@@ -108,6 +116,9 @@ public class ConfiguracionActivity extends AppCompatActivity {
                 if (null!=tiempoP && null!=tiempoT){
                     tiempoTotal.setText(tiempoT);
                     tiempoPalabra.setText(tiempoP);
+                }else {
+                    tiempoPalabra.setText( tiempopalabrat+"");
+                    tiempoTotal.setText( tiempot+"");
                 }
                 break;
         }

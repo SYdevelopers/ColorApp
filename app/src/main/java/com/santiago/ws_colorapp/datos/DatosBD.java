@@ -44,7 +44,7 @@ public class DatosBD extends SQLiteOpenHelper {
         try {
             database=getReadableDatabase();
             Cursor cursor=database.rawQuery("SELECT * FROM "+Utils.TBL_PUNTAJES+" ORDER BY "+ Utils.CAMPO_REACCION
-                                            + " DESC LIMIT 0,4",null );
+                                            + " DESC LIMIT 0,5",null );
 
             if (cursor.moveToFirst()) {
                 return cursor;
