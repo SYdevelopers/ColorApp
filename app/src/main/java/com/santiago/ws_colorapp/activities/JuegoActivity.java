@@ -124,12 +124,18 @@ public class JuegoActivity extends AppCompatActivity {
 
     }
     private void cambiarPalabra() {
+        //habilitamos los botones
         habilitarBotones();
+        //aumentamos en una la camtidad de palabras
         totalPalabaras++;
+        //le determinamos a movimientos el valor de total_palabras
         movimientos.setText(totalPalabaras+"");
+        // generamos un random para las palabras
         posicionPalabra=random.nextInt(4);
+        //determinamos una de las palabras del array dependiendo del random dado
         palabra.setText(colores[posicionPalabra]);
 
+        //generamos en contador de tiempo para las palabras
         new CountDownTimer(tiempoPalabra,mil) {
             @Override
             public void onTick(long l) {
@@ -138,6 +144,7 @@ public class JuegoActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
+                //definimos que pasaria si no se acaba el tiempo y no se selecciona un boton
                 if (!tiempo.getText().toString().equalsIgnoreCase("0''")){
                     if (seleccion==false){
                         porReaccion=((float) correctas/(float) totalPalabaras)*100;
@@ -145,6 +152,7 @@ public class JuegoActivity extends AppCompatActivity {
                         incorrectas++;
                     }
 
+                    //llamamos de nuevo los metodos para cambiarColorPalabra, cambiarPalabra, cambiarColorBoton
                     cambiarColorPalabra();
                     cambiarPalabra();
                     cambiarColorBoton();
@@ -153,21 +161,37 @@ public class JuegoActivity extends AppCompatActivity {
         }.start();
 
     }
+
+    //se crean variables enteras que representan el color de cada boton
     int bColor1=0,bColor2=0,bColor3=0,bColor4=0;
     private void cambiarColorBoton() {
+        //pasamos seleccion a ser falsa
         seleccion=false;
+        //creamos unas variables booleanas que representan a cada boton y se inicializar en falso
         boolean btn1=false,btn2=false,btn3=false,btn4=false;
+        //se crean variables entera que representan los 4 colores
         int color1=0,color2=0,color3=0,color4=0;
+        //mientra uno de los botones este en falso
         while (btn1==false || btn2==false || btn3==false || btn4==false){
+            //se crea una variable entera que guarda un numero entero aleatorio
             int azar=random.nextInt(4);
+            //se hace un switch dependiendo del numero
             switch (azar){
+                //en case de 0
                 case 0:
+                    //si el boton 1 esta falso
                     if (btn1==false){
+                        //si alguno de los colores esta en 0
                         if (color1==0){
+                            //al boton f_1 se le da el color correspondiente
                             fab1.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#b7b716")));
+                            //al color del boton se le da un valor dependiendo de la posicion
                             bColor1=0;
+                            //la variable del color se cambia por 1
                             color1=1;
+                            //a la variable que representa el color de le asigna true
                             btn1=true;
+                            //se finailza en caso
                             break;
                         }
                         if (color2==0){
@@ -290,10 +314,15 @@ public class JuegoActivity extends AppCompatActivity {
             }
         }
     }
+
+    //creo una variable entera
     int color=0;
     private void cambiarColorPalabra() {
+        //genero un numero aleatio en la variable creada
         color=random.nextInt(4);
+        //hago un switch dependiendo del numero aleatorio
         switch (color){
+            //dependiendo del caso se determina un color al texto
             case 0: palabra.setTextColor(Color.parseColor("#b7b716"));
                 break;
             case 1: palabra.setTextColor(Color.parseColor("#0a7300"));
@@ -303,20 +332,20 @@ public class JuegoActivity extends AppCompatActivity {
             case 3: palabra.setTextColor(Color.parseColor("#c71f1e"));
                 break;
         }
-        new CountDownTimer(tiempoPalabra,mil) {
-            @Override
-            public void onTick(long l) {
-
-            }
-
-            @Override
-            public void onFinish() {
-                if (!tiempo.getText().toString().equalsIgnoreCase("0''")){
-                    cambiarColorPalabra();
-                }
-
-            }
-        }.start();
+//        new CountDownTimer(tiempoPalabra,mil) {
+//            @Override
+//            public void onTick(long l) {
+//
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                if (!tiempo.getText().toString().equalsIgnoreCase("0''")){
+//                    cambiarColorPalabra();
+//                }
+//
+//            }
+//        }.start();
 
     }
 
@@ -324,11 +353,16 @@ public class JuegoActivity extends AppCompatActivity {
 
 
     public void pausarJuego(View view) {
+        //aumenta el count en uno
         count++;
+        //dependiendo de si el estado es uno verdadero ejecute un metodo
         if (estado){
+            //llama a play
             play();
         }else {
+            //llamar a pause
             pausar();
+            //se desabilita  la palabra y los botones
             palabra.setEnabled(false);
             desabilitarBotones();
         }
@@ -343,15 +377,23 @@ public class JuegoActivity extends AppCompatActivity {
 
     }
     private void pausar() {
+        //mermamos en una el totalPalabras
         totalPalabaras--;
+        //el tiempo lo ponemos en 0
         tiempo.setText("0''");
+        //cancelamos el contador
         contador.cancel();
+        //cambiarmos el estado a true
         estado=true;
+        //cambiamos el backgroup del boton
         pause.setBackgroundResource(R.drawable.play);
     }
     private void actualizarTextoTiempo() {
+        //creo una variable entera
         int t= (int) (tiempoTotal/mil);
+        //creo una variable string y le determino en formaato para mostrar el valor
         String tt= String.format( Locale.getDefault(),"%02d", t);
+        //ese valor se lo paso al tiempo
         tiempo.setText(tt);
 
     }
@@ -359,10 +401,16 @@ public class JuegoActivity extends AppCompatActivity {
 
 
     public void verificarRespuesta(View view) {
+        //paso a seleccion a ser true
         seleccion=true;
+        //desabilita los botones
         desabilitarBotones();
+
+        //si el id que trae es igual al id de uno de los botones
         if (view.getId()==fab1.getId()){
+            //si el color que biene de la palabra es igual en que biene del boton
             if (color==bColor1){
+                //aumente en una las correactas
                 correctas++;
             }
         }
